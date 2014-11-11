@@ -69,8 +69,9 @@ function _render_contents($contents){
     }
     else if(is_array($contents)){
         $ret = "";
-        foreach ($contents as $tag)
-            $ret .= render($tag);
+        foreach ($contents as $id => $tag)
+            if (is_int($id))
+                $ret .= render($tag);
     }
 
     return $ret;
