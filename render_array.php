@@ -77,9 +77,11 @@ function _render_contents($contents){
     return $ret;
 }
 
-function render($array){
-    if (!empty($array['#callback']))
-        return call_user_func_array($array['#callback'], array($array));
+function render($array, ...$opts){
+    if (!empty($array['#callback'])){
+        array_unshift($opts, $array);
+        return call_user_func_array($array['#callback'], $opts);
+    }
 
     if (is_string($array))
         return $array;

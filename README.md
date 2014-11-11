@@ -50,3 +50,28 @@ by spaces before being added to the argument like so:
 Will become...
 
     <div class="wow such-class very-array" />
+
+####Callbacks
+As mentioned before, by assigning the `#callback` value to a render array it
+will be rendered by that function instead. Additionally, extra parameters can be
+passed to `render()` which will be passed on to the callback like so:
+
+    function wierdCallback($array, $string = "", $useString = ""){
+        return $useString ? $string : $array;
+    }
+    
+    $array = array(
+        '#contents' => "This text",
+        '#callback' => wierdCallback,
+        );
+    
+    echo render($array, "That text", TRUE);
+    echo render($array, "That text", FALSE);
+
+Will result in:
+
+    <div>That text</div><div>This text</div>
+
+Note that you should provide default arguments for a callback. If it is called
+with a single paramater as in `render($array)` you will deserve the PHP errors
+you get for missing parameters.

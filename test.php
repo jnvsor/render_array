@@ -47,6 +47,22 @@ $callbackTest['#callback'] = "wooooohooooo";
 $output .= render($callbackTest);
 $expected .= '<div>WooooOOOOoooHoooOOOooo! Render callbacks woohoo!</div>';
 
+function opts_test($array, $string = ""){
+    return render(array('#contents' => $string));
+}
+$optsTest = $wierdList;
+$optsTest['#callback'] = "opts_test";
+$output .= render($optsTest, "test-string", "other-test-string");
+$expected .= '<div>test-string</div>';
+
+function opts_test2($array, $string = "", $secondstring = ""){
+    return render(array('#contents' => $secondstring));
+}
+$optsTest2 = $wierdList;
+$optsTest2['#callback'] = "opts_test2";
+$output .= render($optsTest2, "test-string", "other-test-string");
+$expected .= '<div>other-test-string</div>';
+
 $quotes = array(
     '#tag' => "input",
     'type' => "text",
