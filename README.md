@@ -6,6 +6,7 @@ drupal has spoiled me with it's easily altered datatypes.
 This is a cheap an' nasty implementation of the aforementioned render
 array concept.
 
+###Usage
 Elements of a render array where the key begins with a `#` character will be
 skipped on rendering. These can be used for render functions to do fancy
 stuff with.
@@ -28,7 +29,7 @@ These special elements are:
     If you want a single render array as the sub item, still remember to
     enclose it in an array like so:
 
-        $array['contents'] = array($subItem);
+        $array['#contents'] = array($subItem);
 * `#callback`: An optional rendering override hook. `render()` will call this
     function if it is found.
 
@@ -44,8 +45,8 @@ Forgetting the # in contents leads to this:
 Additionally, arguments that contain an array will have their contents split
 by spaces before being added to the argument like so:
 
-     $array['class'] = array("wow", "such-class", "very-array");
+    $array['class'] = array("wow", "such-class", "very-array");
 
 Will become...
 
-     <div class="wow such-class very-array" />
+    <div class="wow such-class very-array" />
