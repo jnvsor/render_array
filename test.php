@@ -25,6 +25,7 @@
 require './render_array.php';
 
 $expected = "";
+$output = "";
 
 $wierdList = array(
     '#tag' => "ul",
@@ -34,6 +35,7 @@ $wierdList = array(
         array('#tag' => "button", 'class' => array("button", "really-big-button"), '#contents' => "working!")
     ),
 );
+$output .= render($wierdList);
 $expected .= '<ul><li>Yay</li>It\'s<button class="button really-big-button">working!</button></ul>';
 
 function wooooohooooo($array){
@@ -42,6 +44,7 @@ function wooooohooooo($array){
 
 $callbackTest = $wierdList;
 $callbackTest['#callback'] = "wooooohooooo";
+$output .= render($callbackTest);
 $expected .= '<div>WooooOOOOoooHoooOOOooo! Render callbacks woohoo!</div>';
 
 $quotes = array(
@@ -49,6 +52,7 @@ $quotes = array(
     'type' => "text",
     'value' => "user input with \"quotes\""
 );
+$output .= render($quotes);
 $expected .= '<input type="text" value="user input with &quot;quotes&quot;" />';
 
 $quotesMulti = array(
@@ -60,21 +64,16 @@ $quotesMulti = array(
         "background-image: url(\"http://www.w3.org/html/logo/downloads/HTML5_Logo_128.png\");",
     ),
 );
+$output .= render($quotesMulti);
 $expected .= '<div style="width: 100px; height: 100px; background: red; background-image: url(&quot;http://www.w3.org/html/logo/downloads/HTML5_Logo_128.png&quot;);" />';
 
 $emptyTag = array('#contents' => "");
+$output .= render($emptyTag);
 $expected .= '<div></div>';
 
 $singleTag = array('#contents' => NULL);
-$expected .= '<div />';
-
-$output = "";
-$output .= render($wierdList);
-$output .= render($callbackTest);
-$output .= render($quotes);
-$output .= render($quotesMulti);
-$output .= render($emptyTag);
 $output .= render($singleTag);
+$expected .= '<div />';
 
 if ($output == $expected)
     echo "Test passed";
