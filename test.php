@@ -68,14 +68,13 @@ $expected .= '<div></div>';
 $singleTag = array('#contents' => NULL);
 $expected .= '<div />';
 
-ob_start();
-echo render($wierdList);
-echo render($callbackTest);
-echo render($quotes);
-echo render($quotesMulti);
-echo render($emptyTag);
-echo render($singleTag);
-$output = ob_get_clean();
+$output = "";
+$output .= render($wierdList);
+$output .= render($callbackTest);
+$output .= render($quotes);
+$output .= render($quotesMulti);
+$output .= render($emptyTag);
+$output .= render($singleTag);
 
 if ($output == $expected)
     echo "Test passed";
