@@ -48,7 +48,7 @@ $array['placeholder'] = "woot";
 $array['contents'] = "hellYeah";
 ```
 
-Forgetting the # in contents leads to this:
+Forgetting the `#` in contents leads to this:
 
 ```html
 <div placeholder="woot" contents="hellYeah" />
