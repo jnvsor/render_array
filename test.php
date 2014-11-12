@@ -24,75 +24,95 @@
 
 require './render_array.php';
 
-$expected = "";
-$output = "";
+class test_render {
+    private $tests = 0;
+    private $passed = 0;
+    private $failed = 0;
 
-$wierdList = array(
+    public function test($array, $expect, $opts = NULL){
+        if ($opts)
+            $output = render($array, $opts);
+        else
+            $output = render($array);
+
+        $this->tests++;
+        if ($output == $expect){
+            $this->passed++;
+            echo "<p>Test ".$this->tests." passed. Got:</p>\n\n";
+            echo "<code>".htmlspecialchars($output)."</code>\n";
+            echo "<hr style=\"border: 1px solid #0F0;\"/>\n\n";
+        }
+        else{
+            $this->failed++;
+            echo "<p style=\"color: red; font-weight: bold;\">Test ".$this->tests." failed. Expected:</p>\n\n";
+            echo "<code>".htmlspecialchars($expect)."</code>\n";
+            echo "<p>Got:</p>\n\n";
+            echo "<code>".htmlspecialchars($output)."</code>\n";
+            echo "<hr style=\"border: 1px solid #F00;\"/>\n\n";
+        }
+    }
+
+    public function summary(){
+        echo "<p>".$this->tests." tests run. ".$this->failed." failures.</p>";
+    }
+}
+
+$t = new test_render;
+
+
+/* Standard text test */
+$simple = array('#contents' => "text");
+$t->test($simple, '<div>text</div>');
+
+/* Nesting test */
+$nested = array(
     '#tag' => "ul",
     '#contents' => array(
         array('#tag' => "li", '#contents' => "Yay"),
         "It's",
-        array('#tag' => "button", 'class' => array("button", "really-big-button"), '#contents' => "working!")
+        array('#tag' => "button", '#contents' => "working!")
     ),
 );
-$output .= render($wierdList);
-$expected .= '<ul><li>Yay</li>It\'s<button class="button really-big-button">working!</button></ul>';
+$t->test($nested, '<ul><li>Yay</li>It\'s<button>working!</button></ul>');
 
-function wooooohooooo($array){
-    return render(array('#contents' => "WooooOOOOoooHoooOOOooo! Render callbacks woohoo!"));
+/* Empty tag test */
+$emptyTag = array('#contents' => "");
+$t->test($emptyTag, '<div></div>');
+
+/* Single tag test */
+$singleTag = array('#tag' => "hr");
+$t->test($singleTag, '<hr />');
+
+/* Callback test */
+function callbackTest($array){
+    return render(array('#contents' => "Callback Test passed!"));
 }
-$callbackTest = $wierdList;
-$callbackTest['#callback'] = "wooooohooooo";
-$output .= render($callbackTest);
-$expected .= '<div>WooooOOOOoooHoooOOOooo! Render callbacks woohoo!</div>';
+$callbackTest = $nested;
+$callbackTest['#callback'] = "callbackTest";
+$t->test($callbackTest, '<div>Callback Test passed!</div>', array("options!"));
 
+/* Callback options test */
 function opts_test($array, $opts){
     return render(array('#contents' => $opts[0]));
 }
-$optsTest = $wierdList;
+$optsTest = $nested;
 $optsTest['#callback'] = "opts_test";
-$output .= render($optsTest, array("test-string", "other-test-string"));
-$expected .= '<div>test-string</div>';
+$t->test($optsTest, '<div>test-string</div>', "test-string");
 
-function opts_test2($array, $opts){
+/* Multiple callback options test */
+function multi_opts_test($array, $opts){
     return render(array('#contents' => $opts[1]));
 }
-$optsTest2 = $wierdList;
-$optsTest2['#callback'] = "opts_test2";
-$output .= render($optsTest2, array("test-string", "other-test-string"));
-$expected .= '<div>other-test-string</div>';
+$multi_opts_test = $nested;
+$multi_opts_test['#callback'] = "multi_opts_test";
+$t->test($multi_opts_test, '<div>other-test-string</div>', array("test-string", "other-test-string"));
 
+/* Quotes escaping test */
 $quotes = array(
     '#tag' => "input",
     'type' => "text",
     'value' => "user input with \"quotes\""
 );
-$output .= render($quotes);
-$expected .= '<input type="text" value="user input with &quot;quotes&quot;" />';
+$t->test($quotes, '<input type="text" value="user input with &quot;quotes&quot;" />');
 
-$quotesMulti = array(
-    '#contents' => NULL,
-    'style' => array(
-        "width: 100px;",
-        "height: 100px;",
-        "background: red;",
-        "background-image: url(\"http://www.w3.org/html/logo/downloads/HTML5_Logo_128.png\");",
-    ),
-);
-$output .= render($quotesMulti);
-$expected .= '<div style="width: 100px; height: 100px; background: red; background-image: url(&quot;http://www.w3.org/html/logo/downloads/HTML5_Logo_128.png&quot;);" />';
-
-$emptyTag = array('#contents' => "");
-$output .= render($emptyTag);
-$expected .= '<div></div>';
-
-$singleTag = array('#contents' => NULL);
-$output .= render($singleTag);
-$expected .= '<div />';
-
-if ($output == $expected)
-    echo "Test passed";
-else
-    echo "<span style=\"color: red; font-weight: bold;\">Test failed</span>";
-
-echo "<br />Here's the code:<hr />\n\n".$output;
+$t->summary();
