@@ -77,11 +77,12 @@ function _render_contents($contents){
     return $ret;
 }
 
-function render($array, ...$opts){
-    if (!empty($array['#callback'])){
-        array_unshift($opts, $array);
-        return call_user_func_array($array['#callback'], $opts);
-    }
+function render($array, $opts = NULL){
+    if (!is_array($opts))
+        $opts = array($opts);
+
+    if (!empty($array['#callback']))
+        return call_user_func_array($array['#callback'], array($array, $opts));
 
     if (is_string($array))
         return $array;

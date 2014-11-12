@@ -73,8 +73,8 @@ will be rendered by that function instead. Additionally, extra parameters can be
 passed to `render()` which will be passed on to the callback like so:
 
 ```php
-function wierdCallback($array, $string = "", $useString = ""){
-    return $useString ? $string : $array;
+function wierdCallback($array, $opts){
+    return $opts['use_default'] ? $string : $opts['replacement'];
 }
 
 $array = array(
@@ -82,8 +82,8 @@ $array = array(
     '#callback' => wierdCallback,
     );
 
-echo render($array, "That text", TRUE);
-echo render($array, "That text", FALSE);
+echo render($array, array('use_default' => FALSE, 'replacement' => "That text"));
+echo render($array, array('use_default' => TRUE, 'replacement' => "That text"));
 ```
 
 Will result in:
@@ -91,7 +91,3 @@ Will result in:
 ```html
 <div>That text</div><div>This text</div>
 ```
-
-Note that you should provide default arguments for a callback. If it is called
-with a single paramater as in `render($array)` you will deserve the PHP errors
-you get for missing parameters.
