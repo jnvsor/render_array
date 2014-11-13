@@ -127,4 +127,10 @@ $weights = array(
 );
 $t->test($weights, '<div><strong></strong><em></em><u></u><span></span></div>');
 
+/* Correctly distinguish array from element test */
+$array = array("string", array('#contents' => "woot"));
+$element = array('#tag' => "img");
+$t->test($array, 'string<div>woot</div>');
+$t->test($element, '<img />');
+
 $t->summary();

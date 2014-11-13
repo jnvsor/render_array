@@ -96,6 +96,14 @@ function render($array, $opts = NULL){
     if (is_string($array))
         return $array;
 
+    /* If neither #tag nor #contents nor #callback are set this would
+     * evaluate to '<div />' which is invalid HTML - thus we can infer
+     * that this is an array of elements after this check */
+    if (!isset($array['#tag']) &&
+        !isset($array['#contents']) &&
+        !isset($array['#callback']))
+        return _render_contents($array);
+
     $tag = empty($array['#tag']) ? "div" : $array['#tag'];
     $ret = "<".$tag;
     $ret .= _render_attributes($array);
