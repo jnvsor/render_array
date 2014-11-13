@@ -12,7 +12,7 @@ skipped on rendering. These can be used for render functions to do fancy
 stuff with.
 
 Anything that doesn't begin with a `#` character is parsed as an HTML tag
-attribute. The default render function parses 3 special elements.
+attribute. The default render function parses 4 special elements.
 
 These special elements are:
 
@@ -40,6 +40,7 @@ These special elements are:
 
 * `#callback`: An optional rendering override hook. `render()` will call this
     function if it is found.
+* `#weight`: Elements with a heavier weight will be rendered later.
 
 All other values are parsed as arguments like so:
 

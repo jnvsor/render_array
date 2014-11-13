@@ -63,15 +63,21 @@ function _render_attributes($array){
     return $ret;
 }
 
+function _weight_cmp($a, $b){
+    $aWeight = (isset($a['#weight']) && is_numeric($a['#weight'])) ? $a['#weight'] : 0;
+    $bWeight = (isset($b['#weight']) && is_numeric($b['#weight'])) ? $b['#weight'] : 0;
+    return ($aWeight < $bWeight) ? -1 : 1;
+}
+
 function _render_contents($contents){
     if (is_string($contents)){
         return $contents;
     }
     else if(is_array($contents)){
+        uasort($contents, "_weight_cmp");
         $ret = "";
-        foreach ($contents as $id => $tag)
-            if (is_int($id))
-                $ret .= render($tag);
+        foreach ($contents as $id => $element)
+            $ret .= render($element);
     }
 
     return $ret;

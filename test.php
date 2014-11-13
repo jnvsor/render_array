@@ -115,4 +115,15 @@ $quotes = array(
 );
 $t->test($quotes, '<input type="text" value="user input with &quot;quotes&quot;" />');
 
+/* Weights test */
+$weights = array(
+    '#contents' => array(
+        array('#tag' => "span", '#weight' => 100, '#contents' => ""),
+        array('#tag' => "strong", '#weight' => -1, '#contents' => ""),
+        array('#tag' => "em", '#contents' => ""),
+        array('#tag' => "u", '#weight' => 0.5, '#contents' => ""),
+    )
+);
+$t->test($weights, '<div><strong></strong><em></em><u></u><span></span></div>');
+
 $t->summary();
