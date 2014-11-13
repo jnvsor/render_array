@@ -90,6 +90,7 @@ function callbackTest($array){
 $callbackTest = $nested;
 $callbackTest['#callback'] = "callbackTest";
 $t->test($callbackTest, '<div>Callback Test passed!</div>', array("options!"));
+$t->test($callbackTest, '<div>Callback Test passed!</div>');
 
 /* Callback options test */
 function opts_test($array, $opts){

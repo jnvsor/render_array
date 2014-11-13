@@ -84,7 +84,7 @@ function _render_contents($contents){
 }
 
 function render($array, $opts = NULL){
-    if (!is_array($opts))
+    if (isset($opts) && !is_array($opts))
         $opts = array($opts);
 
     if (!empty($array['#callback'])){
