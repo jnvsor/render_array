@@ -87,8 +87,11 @@ function render($array, $opts = NULL){
     if (!is_array($opts))
         $opts = array($opts);
 
-    if (!empty($array['#callback']))
-        return call_user_func_array($array['#callback'], array($array, $opts));
+    if (!empty($array['#callback'])){
+        $callback = $array['#callback'];
+        unset($array['#callback']);
+        return call_user_func_array($callback, array($array, $opts));
+    }
 
     if (is_string($array))
         return $array;

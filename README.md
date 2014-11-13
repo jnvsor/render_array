@@ -75,8 +75,6 @@ passed to `render()` which will be passed on to the callback like so:
 
 ```php
 function wierdCallback($array, $opts){
-    unset($array['#callback']);
-
     if (empty($opts['use_default']) || !isset($opts['replacement']))
         return render($array);
     else
@@ -86,7 +84,7 @@ function wierdCallback($array, $opts){
 $array = array(
     '#contents' => "This text",
     '#callback' => "wierdCallback",
-    );
+);
 
 echo render($array, array('use_default' => FALSE, 'replacement' => "That text"));
 echo render($array, array('use_default' => TRUE, 'replacement' => "That text"));
@@ -97,7 +95,3 @@ Will result in:
 ```html
 That text<div>This text</div>
 ```
-
-Note that if you intend to call the standard `render()` function from inside
-your callback, you should unset the callback first or you'll probably end up
-calling yourself infinitely.
