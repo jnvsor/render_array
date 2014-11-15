@@ -61,22 +61,22 @@ $t = new test_render;
 
 
 /* Standard text test */
-$simple = array('#contents' => "text");
+$simple = array('#in' => "text");
 $t->test($simple, '<div>text</div>');
 
 /* Nesting test */
 $nested = array(
     '#tag' => "ul",
-    '#contents' => array(
-        array('#tag' => "li", '#contents' => "Yay"),
+    '#in' => array(
+        array('#tag' => "li", '#in' => "Yay"),
         "It's",
-        array('#tag' => "button", '#contents' => "working!")
+        array('#tag' => "button", '#in' => "working!")
     ),
 );
 $t->test($nested, '<ul><li>Yay</li>It\'s<button>working!</button></ul>');
 
 /* Empty tag test */
-$emptyTag = array('#contents' => "");
+$emptyTag = array('#in' => "");
 $t->test($emptyTag, '<div></div>');
 
 /* Single tag test */
@@ -85,7 +85,7 @@ $t->test($singleTag, '<hr />');
 
 /* Callback test */
 function callbackTest($array){
-    return render(array('#contents' => "Callback Test passed!"));
+    return render(array('#in' => "Callback Test passed!"));
 }
 $callbackTest = $nested;
 $callbackTest['#callback'] = "callbackTest";
@@ -94,7 +94,7 @@ $t->test($callbackTest, '<div>Callback Test passed!</div>');
 
 /* Callback options test */
 function opts_test($array, $opts){
-    return render(array('#contents' => $opts[0]));
+    return render(array('#in' => $opts[0]));
 }
 $optsTest = $nested;
 $optsTest['#callback'] = "opts_test";
@@ -102,7 +102,7 @@ $t->test($optsTest, '<div>test-string</div>', "test-string");
 
 /* Multiple callback options test */
 function multi_opts_test($array, $opts){
-    return render(array('#contents' => $opts[1]));
+    return render(array('#in' => $opts[1]));
 }
 $multi_opts_test = $nested;
 $multi_opts_test['#callback'] = "multi_opts_test";
@@ -118,17 +118,17 @@ $t->test($quotes, '<input type="text" value="user input with &quot;quotes&quot;"
 
 /* Weights test */
 $weights = array(
-    '#contents' => array(
-        array('#tag' => "span", '#weight' => 100, '#contents' => ""),
-        array('#tag' => "strong", '#weight' => -1, '#contents' => ""),
-        array('#tag' => "em", '#contents' => ""),
-        array('#tag' => "u", '#weight' => 0.5, '#contents' => ""),
+    '#in' => array(
+        array('#tag' => "span", '#weight' => 100, '#in' => ""),
+        array('#tag' => "strong", '#weight' => -1, '#in' => ""),
+        array('#tag' => "em", '#in' => ""),
+        array('#tag' => "u", '#weight' => 0.5, '#in' => ""),
     )
 );
 $t->test($weights, '<div><strong></strong><em></em><u></u><span></span></div>');
 
 /* Correctly distinguish array from element test */
-$array = array("string", array('#contents' => "woot"));
+$array = array("string", array('#in' => "woot"));
 $element = array('#tag' => "img");
 $t->test($array, 'string<div>woot</div>');
 $t->test($element, '<img />');

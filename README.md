@@ -17,11 +17,11 @@ attribute. The default render function parses 4 special elements.
 These special elements are:
 
 * `#tag`: Which tag to use to render this element (Default `div`)
-* `#contents`: Either a string or an array of renderable objects.  
+* `#in`: Either a string or an array of renderable objects.  
     When this is empty, the tag will be closed like so:
 
     ```php
-    $array['#contents'] = NULL;
+    $array['#in'] = NULL;
     $array['#tag'] = "img";
     ```
 
@@ -35,7 +35,7 @@ These special elements are:
     enclose it in an array like so:
 
     ```php
-    $array['#contents'] = array($subItem);
+    $array['#in'] = array($subItem);
     ```
 
 * `#callback`: An optional rendering override hook. `render()` will call this
@@ -46,13 +46,13 @@ All other values are parsed as arguments like so:
 
 ```php
 $array['placeholder'] = "woot";
-$array['contents'] = "hellYeah";
+$array['in'] = "hellYeah";
 ```
 
-Forgetting the `#` in contents leads to this:
+Forgetting the `#` in `#in` leads to this:
 
 ```html
-<div placeholder="woot" contents="hellYeah" />
+<div placeholder="woot" in="hellYeah" />
 ```
 
 Additionally, arguments that contain an array will have their contents split
@@ -82,7 +82,7 @@ function wierdCallback($array, $opts){
 }
 
 $array = array(
-    '#contents' => "This text",
+    '#in' => "This text",
     '#callback' => "wierdCallback",
 );
 

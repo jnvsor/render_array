@@ -96,11 +96,11 @@ function render($array, $opts = NULL){
     if (is_string($array))
         return $array;
 
-    /* If neither #tag nor #contents nor #callback are set this would
-     * evaluate to '<div />' which is invalid HTML - thus we can infer
-     * that this is an array of elements after this check */
+    /* If neither #tag nor #in nor #callback are set this would evaluate to
+     * '<div />' which is invalid HTML - thus we can infer that this is an
+     * array of elements after this check */
     if (!isset($array['#tag']) &&
-        !isset($array['#contents']) &&
+        !isset($array['#in']) &&
         !isset($array['#callback']))
         return _render_contents($array);
 
@@ -108,12 +108,12 @@ function render($array, $opts = NULL){
     $ret = "<".$tag;
     $ret .= _render_attributes($array);
 
-    if (!isset($array['#contents'])){
+    if (!isset($array['#in'])){
         $ret .= " />";
     }
     else {
         $ret .= ">";
-        $ret .= _render_contents($array['#contents']);
+        $ret .= _render_contents($array['#in']);
         $ret .= "</".$tag.">";
     }
 
