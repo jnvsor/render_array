@@ -84,29 +84,28 @@ $singleTag = array('#tag' => "hr");
 $t->test($singleTag, '<hr />');
 
 /* Callback test */
-function callbackTest($array){
-    return render(array('#in' => "Callback Test passed!"));
+function callback_test($array){
+    return array('#in' => array("Callback Test passed!", $array));
 }
-$callbackTest = $nested;
-$callbackTest['#callback'] = "callbackTest";
-$t->test($callbackTest, '<div>Callback Test passed!</div>', array("options!"));
-$t->test($callbackTest, '<div>Callback Test passed!</div>');
+$callbackTest = $singleTag;
+$callbackTest['#callback'] = "callback_test";
+$t->test($callbackTest, '<div>Callback Test passed!<hr /></div>', array("options!"));
+$t->test($callbackTest, '<div>Callback Test passed!<hr /></div>');
 
 /* Callback options test */
 function opts_test($array, $opts){
-    return render(array('#in' => $opts[0]));
+    return array('#in' => array($opts[0], $array));
 }
-$optsTest = $nested;
+$optsTest = $singleTag;
 $optsTest['#callback'] = "opts_test";
-$t->test($optsTest, '<div>test-string</div>', "test-string");
+$t->test($optsTest, '<div>test-string<hr /></div>', "test-string");
 
-/* Multiple callback options test */
-function multi_opts_test($array, $opts){
-    return render(array('#in' => $opts[1]));
-}
-$multi_opts_test = $nested;
-$multi_opts_test['#callback'] = "multi_opts_test";
-$t->test($multi_opts_test, '<div>other-test-string</div>', array("test-string", "other-test-string"));
+/* Multiple callback test */
+$multi_callback_test = $singleTag;
+$multi_callback_test['#callback'] = array("callback_test", "opts_test");
+$t->test($multi_callback_test, '<div>test-string<div>Callback Test passed!<hr /></div></div>', "test-string");
+$multi_callback_test['#callback'] = array("opts_test", "callback_test");
+$t->test($multi_callback_test, '<div>Callback Test passed!<div>test-string<hr /></div></div>', "test-string");
 
 /* Quotes escaping test */
 $quotes = array(

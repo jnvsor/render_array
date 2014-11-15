@@ -23,6 +23,28 @@
  */
 
 
+function _process_callbacks($array, $opts){
+    $callback = $array['#callback'];
+
+    if (is_string($callback)){
+        unset($array['#callback']);
+        $array = call_user_func_array($callback, array($array, $opts));
+    }
+    else if (is_array($callback)){
+        foreach ($callback as $key => $func){
+            $array['#callback'] = $callback[$key];
+            $array = _process_callbacks($array, $opts);
+        }
+    }
+    else {
+        trigger_error("The callback is not a string or an array.", E_USER_WARNING);
+        return "";
+    }
+
+    unset($array['#callback']);
+    return $array;
+}
+
 function _render_attribute_values($values){
     if (is_string($values)){
         return htmlspecialchars($values);
@@ -85,13 +107,11 @@ function _render_contents($contents){
 }
 
 function render($array, $opts = NULL){
-    if (isset($opts) && !is_array($opts))
-        $opts = array($opts);
-
     if (!empty($array['#callback'])){
-        $callback = $array['#callback'];
-        unset($array['#callback']);
-        return call_user_func_array($callback, array($array, $opts));
+        if (isset($opts) && !is_array($opts))
+            $opts = array($opts);
+
+        return render(_process_callbacks($array, $opts));
     }
 
     if (is_string($array))
