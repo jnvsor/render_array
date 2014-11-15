@@ -76,9 +76,12 @@ function _render_contents($contents){
         $ret = "";
         foreach ($contents as $id => $element)
             $ret .= render($element);
+        return $ret;
     }
-
-    return $ret;
+    else {
+        trigger_error("This element is not a renderable type.", E_USER_WARNING);
+        return "";
+    }
 }
 
 function render($array, $opts = NULL){
@@ -93,6 +96,11 @@ function render($array, $opts = NULL){
 
     if (is_string($array))
         return $array;
+
+    if (!is_array($array)){
+        trigger_error("This element is not a renderable type.", E_USER_WARNING);
+        return "";
+    }
 
     /* If neither #tag nor #in nor #callback are set this would evaluate to
      * '<div />' which is invalid HTML - thus we can infer that this is an
