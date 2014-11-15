@@ -22,24 +22,22 @@
  * 
  */
 
-function _render_attribute_values($values){
-    $ret = "";
 
+function _render_attribute_values($values){
     if (is_string($values)){
-        $ret .= str_replace("\"", "&quot;", $values);
+        return htmlspecialchars($values);
     }
 
     /* Loop through sub-attributes
      * (EG looping through classes in the class attribute) */
     else if (is_array($values)){
+        $ret = "";
         foreach ($values as $item){
             if(is_string($item))
-                $ret .= str_replace("\"", "&quot;", $item)." ";
+                $ret .= htmlspecialchars($item)." ";
         }
-        $ret = rtrim($ret);
+        return rtrim($ret);
     }
-
-    return $ret;
 }
 
 function _render_attributes($array){
