@@ -64,6 +64,19 @@ $t = new test_render;
 $simple = array('#in' => "text");
 $t->test($simple, '<div>text</div>');
 
+/* Attributes test */
+$attributes = array(
+    '#tag' => "img",
+    'string' => "Str\"ing",
+    'int' => 42,
+    'float' => 42.222,
+    'bool' => FALSE,
+    'otherbool' => TRUE,
+    'null' => NULL,
+    'array' => array("st\"uff", 4, FALSE, TRUE, array("more\"stuff", 6, FALSE, TRUE, array(4))),
+);
+$t->test($attributes, '<img string="Str&quot;ing" int="42" float="42.222" otherbool array="st&quot;uff 4 more&quot;stuff 6 4" />');
+
 /* Nesting test */
 $nested = array(
     '#tag' => "ul",
@@ -128,14 +141,6 @@ $mc = new testMultiCallback;
 $obj_callback_test = $singleTag;
 $obj_callback_test['#callback'] = array(array($c, "call"), array($mc, "call"));
 $t->test($obj_callback_test, '<code><quote>Woot</quote></code>');
-
-/* Quotes escaping test */
-$quotes = array(
-    '#tag' => "input",
-    'type' => "text",
-    'value' => "user input with \"quotes\""
-);
-$t->test($quotes, '<input type="text" value="user input with &quot;quotes&quot;" />');
 
 /* Weights test */
 $weights = array(

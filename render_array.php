@@ -44,42 +44,48 @@ function _process_callbacks($array, $opts){
     }
 }
 
-function _render_attribute_values($values){
-    if (is_string($values)){
-        return htmlspecialchars($values);
-    }
-
-    /* Loop through sub-attributes
-     * (EG looping through classes in the class attribute) */
-    else if (is_array($values)){
-        $ret = "";
-        foreach ($values as $item){
-            if(is_string($item))
-                $ret .= htmlspecialchars($item)." ";
-        }
-        return rtrim($ret);
-    }
-}
-
 function _render_attributes($array){
     $ret = "";
-
     foreach ($array as $attr => $attrVal){
-        if (substr($attr, 0, 1) == "#" ||
-            !(is_string($attrVal) || is_array($attrVal)))
+        if (substr($attr, 0, 1) == "#")
             continue;
 
-        if (empty($attrVal)){
+        if ($attrVal === TRUE){
             $ret .= " ".$attr;
             continue;
         }
 
-        $ret .= " ".$attr."=\"";
-        $ret .= _render_attribute_values($attrVal);
-        $ret .= "\"";
-    }
+        if (is_string($attrVal) || is_numeric($attrVal)){
+            $ret .= " ".$attr."=\"";
+            $ret .= htmlspecialchars((string) $attrVal);
+            $ret .= "\"";
+            continue;
+        }
 
+        if (is_array($attrVal)){
+            $ret .= " ".$attr."=\"";
+            $ret .= htmlspecialchars(_render_value($attrVal));
+            $ret .= "\"";
+            continue;
+        }
+    }
     return $ret;
+}
+
+function _render_value($value){
+    $ret = "";
+    foreach ($value as $item){
+        if (is_string($item) || is_numeric($item)){
+            $ret .= $item." ";
+            continue;
+        }
+
+        if (is_array($item)){
+            $ret .= _render_value($item)." ";
+            continue;
+        }
+    }
+    return rtrim($ret);
 }
 
 function _weight_cmp($a, $b){
