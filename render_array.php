@@ -26,23 +26,22 @@
 function _process_callbacks($array, $opts){
     $callback = $array['#callback'];
 
-    if (is_string($callback)){
+    if (is_callable($callback)){
         unset($array['#callback']);
-        $array = call_user_func_array($callback, array($array, $opts));
+        return call_user_func_array($callback, array($array, $opts));
     }
     else if (is_array($callback)){
         foreach ($callback as $key => $func){
             $array['#callback'] = $callback[$key];
             $array = _process_callbacks($array, $opts);
         }
+        unset($array['#callback']);
+        return $array;
     }
     else {
-        trigger_error("The callback is not a string or an array.", E_USER_WARNING);
+        trigger_error("The callback is not a callable or an array.", E_USER_WARNING);
         return "";
     }
-
-    unset($array['#callback']);
-    return $array;
 }
 
 function _render_attribute_values($values){

@@ -107,6 +107,28 @@ $t->test($multi_callback_test, '<div>test-string<div>Callback Test passed!<hr />
 $multi_callback_test['#callback'] = array("opts_test", "callback_test");
 $t->test($multi_callback_test, '<div>Callback Test passed!<div>test-string<hr /></div></div>', "test-string");
 
+/* Object callback test */
+class testCallback {
+    public function call(){
+        return array('#tag' => "quote", '#in' => "Woot");
+    }
+}
+$c = new testCallback;
+$obj_callback_test = $singleTag;
+$obj_callback_test['#callback'] = array($c, "call");
+$t->test($obj_callback_test, '<quote>Woot</quote>');
+
+/* Multiple object callback test */
+class testMultiCallback {
+    public function call($array){
+        return array('#tag' => "code", '#in' => array($array));
+    }
+}
+$mc = new testMultiCallback;
+$obj_callback_test = $singleTag;
+$obj_callback_test['#callback'] = array(array($c, "call"), array($mc, "call"));
+$t->test($obj_callback_test, '<code><quote>Woot</quote></code>');
+
 /* Quotes escaping test */
 $quotes = array(
     '#tag' => "input",
