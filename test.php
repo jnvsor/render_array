@@ -100,30 +100,34 @@ $t->test($singleTag, '<hr />');
 function callback_test($array){
     return array('#in' => array("Callback Test passed!", $array));
 }
-$callbackTest = $singleTag;
+$callbackTest = array('#tag' => "span", '#in' => "");
 $callbackTest['#callback'] = "callback_test";
-$t->test($callbackTest, '<div>Callback Test passed!<hr /></div>', array("options!"));
-$t->test($callbackTest, '<div>Callback Test passed!<hr /></div>');
+$t->test($callbackTest, '<div>Callback Test passed!<span></span></div>', array("options!"));
+$t->test($callbackTest, '<div>Callback Test passed!<span></span></div>');
 
 /* Callback options test */
 function opts_test($array, $opts){
-    return array('#in' => array($opts[0], $array));
+    $array['#in'] = $opts[0];
+    return $array;
 }
-$optsTest = $singleTag;
+$optsTest = array('#tag' => "span", '#in' => "");
 $optsTest['#callback'] = "opts_test";
-$t->test($optsTest, '<div>test-string<hr /></div>', "test-string");
+$t->test($optsTest, '<span>test-string</span>', "test-string");
 
 /* Multiple callback test */
-$multi_callback_test = $singleTag;
+$multi_callback_test = array('#tag' => "span", '#in' => "");
 $multi_callback_test['#callback'] = array("callback_test", "opts_test");
-$t->test($multi_callback_test, '<div>test-string<div>Callback Test passed!<hr /></div></div>', "test-string");
+$t->test($multi_callback_test, '<div>Callback Test passed!<span>test-string</span></div>', "test-string");
 $multi_callback_test['#callback'] = array("opts_test", "callback_test");
-$t->test($multi_callback_test, '<div>Callback Test passed!<div>test-string<hr /></div></div>', "test-string");
+$t->test($multi_callback_test, '<div>Callback Test passed!<span>test-string</span></div>', "test-string");
 
 /* Object callback test */
 class testCallback {
-    public function call(){
-        return array('#tag' => "quote", '#in' => "Woot");
+    public function call($array){
+        $ret = array('#tag' => "quote", '#in' => "Woot");
+
+        $ret['#callback'] = isset($array['#callback']) ? $array['#callback'] : NULL;
+        return $ret;
     }
 }
 $c = new testCallback;

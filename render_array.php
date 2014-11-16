@@ -32,22 +32,25 @@ function is_render_array($array){
 }
 
 function _process_callbacks($array, $opts){
-    $callback = $array['#callback'];
-
-    if (is_callable($callback)){
+    if (is_callable($array['#callback'])){
+        $callback = $array['#callback'];
         unset($array['#callback']);
         return call_user_func_array($callback, array($array, $opts));
     }
-    else if (is_array($callback)){
-        foreach ($callback as $key => $func){
-            $array['#callback'] = $callback[$key];
-            $array = _process_callbacks($array, $opts);
+    else if (is_array($array['#callback'])){
+        while (!empty($array['#callback'])){
+            $callback = array_shift($array['#callback']);
+            if (is_callable($callback))
+                $array = call_user_func_array($callback, array($array, $opts));
         }
-        unset($array['#callback']);
+
+        if (is_array($array))
+            unset($array['#callback']);
+
         return $array;
     }
     else {
-        trigger_error("The callback is not a callable or an array.", E_USER_WARNING);
+        trigger_error("The callback type '".gettype($array['#callback'])."' is not a callable or an array.", E_USER_WARNING);
         return "";
     }
 }
@@ -96,7 +99,7 @@ function _render_value($value){
     return rtrim($ret);
 }
 
-function _render_contents($contents){
+function _render_contents($contents, $opts){
     if (is_string($contents)){
         return $contents;
     }
@@ -104,7 +107,7 @@ function _render_contents($contents){
         uasort($contents, "_weight_cmp");
         $ret = "";
         foreach ($contents as $element)
-            $ret .= render($element);
+            $ret .= render($element, $opts);
         return $ret;
     }
     else {
@@ -125,18 +128,17 @@ function render($array, $opts = NULL){
         return "";
     }
 
+    if (isset($opts) && !is_array($opts))
+        $opts = array($opts);
+
     if (is_string($array))
         return $array;
 
     if (!is_render_array($array))
-        return _render_contents($array);
+        return _render_contents($array, $opts);
 
-    if (!empty($array['#callback'])){
-        if (isset($opts) && !is_array($opts))
-            $opts = array($opts);
-
-        return render(_process_callbacks($array, $opts));
-    }
+    if (!empty($array['#callback']))
+        return render(_process_callbacks($array, $opts), $opts);
 
     $tag = empty($array['#tag']) ? "div" : $array['#tag'];
     $ret = "<".$tag;
@@ -147,7 +149,7 @@ function render($array, $opts = NULL){
     }
     else {
         $ret .= ">";
-        $ret .= render($array['#in']);
+        $ret .= render($array['#in'], $opts);
         $ret .= "</".$tag.">";
     }
 

@@ -95,3 +95,56 @@ Will result in:
 ```html
 That text<div>This text</div>
 ```
+
+Note that if you change the hierarchy of the array in a callback the callbacks
+for the current element will not move with it. In other words with a callback
+like so:
+
+```php
+function cb($array){
+    return array('#in' => $array);
+}
+```
+
+The callback will have moved one layer deeper. This leads to confusion regarding
+multiple callbacks.
+
+```php
+function cb($array){
+    return array('#tag' => "span", '#in' => $array);
+}
+function cb2($array){
+    return array('#tag' => "code", '#in' => $array);
+}
+render(array('#in' => "Contents", '#callback' => array("cb", "cb2")));
+```
+
+You would expect this code to wrap the `<div>` first in a `<span>`, and then in
+a `<code>`:
+
+```html
+<code><span><div>Contents</div></span></code>
+```
+
+The callbacks remain on the element that has been wrapped, meaning that first
+the div is wrapped in a span, and then the div is wrapped in a code. This
+results in this output:
+
+```html
+<span><code><div>Contents</div></code></span>
+```
+
+This behaviour stops things breaking when you alter the hierarchy, but if you
+want to override it, simply move the callback into your own callback:
+
+```php
+function cb($array){
+    $ret = array('#tag' => "span");
+    if (isset($array['#callback'])){
+        $ret['#callback'] = $array['#callback'];
+        unset($array['#callback']);
+    }
+    $ret['#in'] = $array;
+    return $ret;
+}
+```
