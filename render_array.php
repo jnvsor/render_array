@@ -23,6 +23,14 @@
  */
 
 
+function is_render_array($array){
+    /* If neither #tag nor #in nor #callback are set this would render to
+     * '<div />' which is invalid HTML - thus we can infer that this is not a
+     * render array. */
+    return (is_array($array) &&
+        (isset($array['#tag']) || isset($array['#in']) || isset($array['#callback'])));
+}
+
 function _process_callbacks($array, $opts){
     $callback = $array['#callback'];
 
@@ -88,12 +96,6 @@ function _render_value($value){
     return rtrim($ret);
 }
 
-function _weight_cmp($a, $b){
-    $aWeight = (isset($a['#weight']) && is_numeric($a['#weight'])) ? $a['#weight'] : 0;
-    $bWeight = (isset($b['#weight']) && is_numeric($b['#weight'])) ? $b['#weight'] : 0;
-    return ($aWeight < $bWeight) ? -1 : 1;
-}
-
 function _render_contents($contents){
     if (is_string($contents)){
         return $contents;
@@ -101,39 +103,40 @@ function _render_contents($contents){
     else if(is_array($contents)){
         uasort($contents, "_weight_cmp");
         $ret = "";
-        foreach ($contents as $id => $element)
+        foreach ($contents as $element)
             $ret .= render($element);
         return $ret;
     }
     else {
-        trigger_error("This element is not a renderable type.", E_USER_WARNING);
+        trigger_error("The #in type '".gettype($contents)."' is not a string or an array.", E_USER_WARNING);
         return "";
     }
 }
 
+function _weight_cmp($a, $b){
+    $aWeight = (isset($a['#weight']) && is_numeric($a['#weight'])) ? $a['#weight'] : 0;
+    $bWeight = (isset($b['#weight']) && is_numeric($b['#weight'])) ? $b['#weight'] : 0;
+    return ($aWeight < $bWeight) ? -1 : 1;
+}
+
 function render($array, $opts = NULL){
+    if (!is_string($array) && !is_array($array)){
+        trigger_error("This element type '".gettype($array)."' is not a renderable type.", E_USER_WARNING);
+        return "";
+    }
+
+    if (is_string($array))
+        return $array;
+
+    if (!is_render_array($array))
+        return _render_contents($array);
+
     if (!empty($array['#callback'])){
         if (isset($opts) && !is_array($opts))
             $opts = array($opts);
 
         return render(_process_callbacks($array, $opts));
     }
-
-    if (is_string($array))
-        return $array;
-
-    if (!is_array($array)){
-        trigger_error("This element is not a renderable type.", E_USER_WARNING);
-        return "";
-    }
-
-    /* If neither #tag nor #in nor #callback are set this would evaluate to
-     * '<div />' which is invalid HTML - thus we can infer that this is an
-     * array of elements after this check */
-    if (!isset($array['#tag']) &&
-        !isset($array['#in']) &&
-        !isset($array['#callback']))
-        return _render_contents($array);
 
     $tag = empty($array['#tag']) ? "div" : $array['#tag'];
     $ret = "<".$tag;
@@ -144,7 +147,7 @@ function render($array, $opts = NULL){
     }
     else {
         $ret .= ">";
-        $ret .= _render_contents($array['#in']);
+        $ret .= render($array['#in']);
         $ret .= "</".$tag.">";
     }
 

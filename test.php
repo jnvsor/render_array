@@ -134,7 +134,7 @@ $t->test($obj_callback_test, '<quote>Woot</quote>');
 /* Multiple object callback test */
 class testMultiCallback {
     public function call($array){
-        return array('#tag' => "code", '#in' => array($array));
+        return array('#tag' => "code", '#in' => $array);
     }
 }
 $mc = new testMultiCallback;
