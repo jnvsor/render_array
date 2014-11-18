@@ -149,13 +149,21 @@ $t->test($obj_callback_test, '<code><quote>Woot</quote></code>');
 /* Weights test */
 $weights = array(
     '#in' => array(
-        array('#tag' => "span", '#weight' => 100, '#in' => ""),
-        array('#tag' => "strong", '#weight' => -1, '#in' => ""),
-        array('#tag' => "em", '#in' => ""),
-        array('#tag' => "u", '#weight' => 0.5, '#in' => ""),
+        array('#tag' => "100", '#weight' => 100),
+        "text1",
+        array('#tag' => "1", '#weight' => 1),
+        array('#tag' => "0.5", '#weight' => 0.5),
+        array('#tag' => "0", '#weight' => 0),
+        "text3",
+        array('#tag' => "none"),
+        array('#tag' => "-100", '#weight' => -100),
+        "text2",
+        array('#tag' => "-1", '#weight' => -1),
+        array('#tag' => "-0.5", '#weight' => -0.5),
+        array('#tag' => "-0", '#weight' => -0),
     )
 );
-$t->test($weights, '<div><strong></strong><em></em><u></u><span></span></div>');
+$t->test($weights, '<div><-100 /><-1 /><-0.5 />text1<0 />text3<none />text2<-0 /><0.5 /><1 /><100 /></div>');
 
 /* Correctly distinguish array from element test */
 $array = array("string", array('#in' => "woot"));
