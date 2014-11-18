@@ -140,7 +140,7 @@ function render($array, $opts = NULL){
     if (!empty($array['#callback']))
         return render(_process_callbacks($array, $opts), $opts);
 
-    $tag = empty($array['#tag']) ? "div" : $array['#tag'];
+    $tag = (isset($array['#tag']) && $array['#tag'] != "") ? $array['#tag'] : "div";
     $ret = "<".$tag;
     $ret .= _render_attributes($array);
 
