@@ -104,7 +104,7 @@ function _render_contents($contents, $opts){
         return $contents;
     }
     else if(is_array($contents)){
-        uasort($contents, "_weight_cmp");
+        stable_uasort($contents, "_weight_cmp");
         $ret = "";
         foreach ($contents as $element)
             $ret .= render($element, $opts);
@@ -119,7 +119,39 @@ function _render_contents($contents, $opts){
 function _weight_cmp($a, $b){
     $aWeight = (isset($a['#weight']) && is_numeric($a['#weight'])) ? $a['#weight'] : 0;
     $bWeight = (isset($b['#weight']) && is_numeric($b['#weight'])) ? $b['#weight'] : 0;
-    return ($aWeight < $bWeight) ? -1 : 1;
+    return ($aWeight > $bWeight) ? 1 : -1;
+}
+
+/* This merge sort blatantly stolen from http://php.net/manual/en/function.usort.php#38827
+ * since apparently PHP's sorting functions have been broken forever */
+function stable_uasort(&$array, $cmp_function = 'strcmp') {
+    if (count($array) < 2)
+        return;
+
+    $halfway = count($array) / 2;
+    $array1 = array_slice($array, 0, $halfway);
+    $array2 = array_slice($array, $halfway);
+    stable_uasort($array1, $cmp_function);
+    stable_uasort($array2, $cmp_function);
+
+    if (call_user_func($cmp_function, end($array1), $array2[0]) < 1) {
+        $array = array_merge($array1, $array2);
+        return;
+    }
+
+    $array = array();
+    $ptr1 = $ptr2 = 0;
+    while ($ptr1 < count($array1) && $ptr2 < count($array2)) {
+        if (call_user_func($cmp_function, $array1[$ptr1], $array2[$ptr2]) < 1)
+            $array[] = $array1[$ptr1++];
+        else
+            $array[] = $array2[$ptr2++];
+    }
+    while ($ptr1 < count($array1))
+        $array[] = $array1[$ptr1++];
+    while ($ptr2 < count($array2))
+        $array[] = $array2[$ptr2++];
+    return;
 }
 
 function render($array, $opts = NULL){
