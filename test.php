@@ -171,4 +171,20 @@ $element = array('#tag' => "img");
 $t->test($array, 'string<div>woot</div>');
 $t->test($element, '<img />');
 
+/* #raw test */
+$rawtest = array(
+    array(
+        '#tag' => "img",
+        '#callback' => "callback_test",
+        '#weight' => 10,
+        '#raw' => "text"
+    ),
+    "more text",
+    array(
+        '#weight' => -10,
+        '#raw' => "there is ",
+    ),
+);
+$t->test($rawtest, 'there is more text<div>Callback Test passed!text</div>');
+
 $t->summary();

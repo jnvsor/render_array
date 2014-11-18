@@ -24,11 +24,11 @@
 
 
 function is_render_array($array){
-    /* If neither #tag nor #in nor #callback are set this would render to
-     * '<div />' which is invalid HTML - thus we can infer that this is not a
+    /* If neither #tag nor #in nor #callback nor #raw are set this would render
+     * to '<div />' which is invalid HTML - thus we can infer that this is not a
      * render array. */
     return (is_array($array) &&
-        (isset($array['#tag']) || isset($array['#in']) || isset($array['#callback'])));
+        (isset($array['#tag']) || isset($array['#in']) || isset($array['#callback']) || isset($array['#raw'])));
 }
 
 function _process_callbacks($array, $opts){
@@ -171,6 +171,9 @@ function render($array, $opts = NULL){
 
     if (!empty($array['#callback']))
         return render(_process_callbacks($array, $opts), $opts);
+
+    if (isset($array['#raw']))
+        return $array['#raw'];
 
     $tag = (isset($array['#tag']) && $array['#tag'] != "") ? $array['#tag'] : "div";
     $ret = "<".$tag;

@@ -41,6 +41,8 @@ These special elements are:
 * `#callback`: An optional rendering override hook. `render()` will call this
     function if it is found.
 * `#weight`: Elements with a heavier weight will be rendered later.
+* `#raw`: Ignore '#tag', '#in', and attributes. After ordering and callbacks,
+    return this value directly.
 
 All other values are parsed as arguments like so:
 
