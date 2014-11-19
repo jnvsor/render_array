@@ -119,7 +119,7 @@ function _render_contents($contents, $opts){
 function _weight_cmp($a, $b){
     $aWeight = (isset($a['#weight']) && is_numeric($a['#weight'])) ? $a['#weight'] : 0;
     $bWeight = (isset($b['#weight']) && is_numeric($b['#weight'])) ? $b['#weight'] : 0;
-    return ($aWeight > $bWeight) ? 1 : -1;
+    return $aWeight - $bWeight;
 }
 
 /* This merge sort blatantly stolen from http://php.net/manual/en/function.usort.php#38827
@@ -134,7 +134,7 @@ function stable_uasort(&$array, $cmp_function = 'strcmp') {
     stable_uasort($array1, $cmp_function);
     stable_uasort($array2, $cmp_function);
 
-    if (call_user_func($cmp_function, end($array1), $array2[0]) < 1) {
+    if (call_user_func($cmp_function, end($array1), $array2[0]) <= 0) {
         $array = array_merge($array1, $array2);
         return;
     }
@@ -142,7 +142,7 @@ function stable_uasort(&$array, $cmp_function = 'strcmp') {
     $array = array();
     $ptr1 = $ptr2 = 0;
     while ($ptr1 < count($array1) && $ptr2 < count($array2)) {
-        if (call_user_func($cmp_function, $array1[$ptr1], $array2[$ptr2]) < 1)
+        if (call_user_func($cmp_function, $array1[$ptr1], $array2[$ptr2]) <= 0)
             $array[] = $array1[$ptr1++];
         else
             $array[] = $array2[$ptr2++];
