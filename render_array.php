@@ -122,8 +122,6 @@ function _weight_cmp($a, $b){
     return $aWeight - $bWeight;
 }
 
-/* This merge sort blatantly stolen from http://php.net/manual/en/function.usort.php#38827
- * since apparently PHP's sorting functions have been broken forever */
 function stable_uasort(&$array, $cmp_function = 'strcmp') {
     if (count($array) < 2)
         return;
@@ -134,7 +132,7 @@ function stable_uasort(&$array, $cmp_function = 'strcmp') {
     stable_uasort($array1, $cmp_function);
     stable_uasort($array2, $cmp_function);
 
-    if (call_user_func($cmp_function, end($array1), $array2[0]) <= 0) {
+    if (call_user_func($cmp_function, end($array1), reset($array2)) <= 0) {
         $array = array_merge($array1, $array2);
         return;
     }
