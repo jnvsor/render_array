@@ -24,33 +24,33 @@
 
 
 function is_render_array($array){
-    /* If neither #tag nor #in nor #callback nor #raw are set this would render
+    /* If neither >tag nor > nor >cb nor >raw are set this would render
      * to '<div />' which is invalid HTML - thus we can infer that this is not a
      * render array. */
     return (is_array($array) &&
-        (isset($array['#tag']) || isset($array['#in']) || isset($array['#callback']) || isset($array['#raw'])));
+        (isset($array['>tag']) || isset($array['>']) || isset($array['>cb']) || isset($array['>raw'])));
 }
 
 function _process_callbacks($array, $opts){
-    if (is_callable($array['#callback'])){
-        $callback = $array['#callback'];
-        unset($array['#callback']);
+    if (is_callable($array['>cb'])){
+        $callback = $array['>cb'];
+        unset($array['>cb']);
         return call_user_func_array($callback, array($array, $opts));
     }
-    else if (is_array($array['#callback'])){
-        while (!empty($array['#callback'])){
-            $callback = array_shift($array['#callback']);
+    else if (is_array($array['>cb'])){
+        while (!empty($array['>cb'])){
+            $callback = array_shift($array['>cb']);
             if (is_callable($callback))
                 $array = call_user_func_array($callback, array($array, $opts));
         }
 
         if (is_array($array))
-            unset($array['#callback']);
+            unset($array['>cb']);
 
         return $array;
     }
     else {
-        trigger_error("The callback type '".gettype($array['#callback'])."' is not a callable or an array.", E_USER_WARNING);
+        trigger_error("The callback type '".gettype($array['>cb'])."' is not a callable or an array.", E_USER_WARNING);
         return "";
     }
 }
@@ -58,7 +58,7 @@ function _process_callbacks($array, $opts){
 function _render_attributes($array){
     $ret = "";
     foreach ($array as $attr => $attrVal){
-        if (substr($attr, 0, 1) == "#")
+        if (substr($attr, 0, 1) == '>')
             continue;
 
         if ($attrVal === TRUE){
@@ -111,14 +111,14 @@ function _render_contents($contents, $opts){
         return $ret;
     }
     else {
-        trigger_error("The #in type '".gettype($contents)."' is not a string or an array.", E_USER_WARNING);
+        trigger_error("The child type '".gettype($contents)."' is not a string or an array.", E_USER_WARNING);
         return "";
     }
 }
 
 function _weight_cmp($a, $b){
-    $aWeight = (isset($a['#weight']) && is_numeric($a['#weight'])) ? $a['#weight'] : 0;
-    $bWeight = (isset($b['#weight']) && is_numeric($b['#weight'])) ? $b['#weight'] : 0;
+    $aWeight = (isset($a['>pos']) && is_numeric($a['>pos'])) ? $a['>pos'] : 0;
+    $bWeight = (isset($b['>pos']) && is_numeric($b['>pos'])) ? $b['>pos'] : 0;
     return $aWeight - $bWeight;
 }
 
@@ -167,22 +167,22 @@ function render($array, $opts = NULL){
     if (!is_render_array($array))
         return _render_contents($array, $opts);
 
-    if (!empty($array['#callback']))
+    if (!empty($array['>cb']))
         return render(_process_callbacks($array, $opts), $opts);
 
-    if (isset($array['#raw']))
-        return $array['#raw'];
+    if (isset($array['>raw']))
+        return $array['>raw'];
 
-    $tag = (isset($array['#tag']) && $array['#tag'] != "") ? $array['#tag'] : "div";
+    $tag = (isset($array['>tag']) && $array['>tag'] != "") ? $array['>tag'] : "div";
     $ret = "<".$tag;
     $ret .= _render_attributes($array);
 
-    if (!isset($array['#in'])){
+    if (!isset($array['>'])){
         $ret .= " />";
     }
     else {
         $ret .= ">";
-        $ret .= render($array['#in'], $opts);
+        $ret .= render($array['>'], $opts);
         $ret .= "</".$tag.">";
     }
 

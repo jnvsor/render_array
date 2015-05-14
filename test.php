@@ -61,12 +61,12 @@ $t = new test_render;
 
 
 /* Standard text test */
-$simple = array('#in' => "text");
+$simple = array('>' => "text");
 $t->test($simple, '<div>text</div>');
 
 /* Attributes test */
 $attributes = array(
-    '#tag' => "img",
+    '>tag' => "img",
     'string' => "Str\"ing",
     'int' => 42,
     'float' => 42.222,
@@ -79,110 +79,110 @@ $t->test($attributes, '<img string="Str&quot;ing" int="42" float="42.222" otherb
 
 /* Nesting test */
 $nested = array(
-    '#tag' => "ul",
-    '#in' => array(
-        array('#tag' => "li", '#in' => "Yay"),
+    '>tag' => "ul",
+    '>' => array(
+        array('>tag' => "li", '>' => "Yay"),
         "It's",
-        array('#tag' => "button", '#in' => "working!")
+        array('>tag' => "button", '>' => "working!")
     ),
 );
 $t->test($nested, '<ul><li>Yay</li>It\'s<button>working!</button></ul>');
 
 /* Empty tag test */
-$emptyTag = array('#in' => "");
+$emptyTag = array('>' => "");
 $t->test($emptyTag, '<div></div>');
 
 /* Single tag test */
-$singleTag = array('#tag' => "hr");
+$singleTag = array('>tag' => "hr");
 $t->test($singleTag, '<hr />');
 
 /* Callback test */
 function callback_test($array){
-    return array('#in' => array("Callback Test passed!", $array));
+    return array('>' => array("Callback Test passed!", $array));
 }
-$callbackTest = array('#tag' => "span", '#in' => "");
-$callbackTest['#callback'] = "callback_test";
+$callbackTest = array('>tag' => "span", '>' => "");
+$callbackTest['>cb'] = "callback_test";
 $t->test($callbackTest, '<div>Callback Test passed!<span></span></div>', array("options!"));
 $t->test($callbackTest, '<div>Callback Test passed!<span></span></div>');
 
 /* Callback options test */
 function opts_test($array, $opts){
-    $array['#in'] = $opts[0];
+    $array['>'] = $opts[0];
     return $array;
 }
-$optsTest = array('#tag' => "span", '#in' => "");
-$optsTest['#callback'] = "opts_test";
+$optsTest = array('>tag' => "span", '>' => "");
+$optsTest['>cb'] = "opts_test";
 $t->test($optsTest, '<span>test-string</span>', "test-string");
 
 /* Multiple callback test */
-$multi_callback_test = array('#tag' => "span", '#in' => "");
-$multi_callback_test['#callback'] = array("callback_test", "opts_test");
+$multi_callback_test = array('>tag' => "span", '>' => "");
+$multi_callback_test['>cb'] = array("callback_test", "opts_test");
 $t->test($multi_callback_test, '<div>Callback Test passed!<span>test-string</span></div>', "test-string");
-$multi_callback_test['#callback'] = array("opts_test", "callback_test");
+$multi_callback_test['>cb'] = array("opts_test", "callback_test");
 $t->test($multi_callback_test, '<div>Callback Test passed!<span>test-string</span></div>', "test-string");
 
 /* Object callback test */
 class testCallback {
     public function call($array){
-        $ret = array('#tag' => "quote", '#in' => "Woot");
+        $ret = array('>tag' => "quote", '>' => "Woot");
 
-        $ret['#callback'] = isset($array['#callback']) ? $array['#callback'] : NULL;
+        $ret['>cb'] = isset($array['>cb']) ? $array['>cb'] : NULL;
         return $ret;
     }
 }
 $c = new testCallback;
 $obj_callback_test = $singleTag;
-$obj_callback_test['#callback'] = array($c, "call");
+$obj_callback_test['>cb'] = array($c, "call");
 $t->test($obj_callback_test, '<quote>Woot</quote>');
 
 /* Multiple object callback test */
 class testMultiCallback {
     public function call($array){
-        return array('#tag' => "code", '#in' => $array);
+        return array('>tag' => "code", '>' => $array);
     }
 }
 $mc = new testMultiCallback;
 $obj_callback_test = $singleTag;
-$obj_callback_test['#callback'] = array(array($c, "call"), array($mc, "call"));
+$obj_callback_test['>cb'] = array(array($c, "call"), array($mc, "call"));
 $t->test($obj_callback_test, '<code><quote>Woot</quote></code>');
 
 /* Weights test */
 $weights = array(
-    '#in' => array(
-        array('#tag' => "100", '#weight' => 100),
+    '>' => array(
+        array('>tag' => "100", '>pos' => 100),
         "text1",
-        array('#tag' => "1", '#weight' => 1),
-        array('#tag' => "0.5", '#weight' => 0.5),
-        array('#tag' => "0", '#weight' => 0),
+        array('>tag' => "1", '>pos' => 1),
+        array('>tag' => "0.5", '>pos' => 0.5),
+        array('>tag' => "0", '>pos' => 0),
         "text3",
-        array('#tag' => "none"),
-        array('#tag' => "-100", '#weight' => -100),
+        array('>tag' => "none"),
+        array('>tag' => "-100", '>pos' => -100),
         "text2",
-        array('#tag' => "-1", '#weight' => -1),
-        array('#tag' => "-0.5", '#weight' => -0.5),
-        array('#tag' => "-0", '#weight' => -0),
+        array('>tag' => "-1", '>pos' => -1),
+        array('>tag' => "-0.5", '>pos' => -0.5),
+        array('>tag' => "-0", '>pos' => -0),
     )
 );
 $t->test($weights, '<div><-100 /><-1 /><-0.5 />text1<0 />text3<none />text2<-0 /><0.5 /><1 /><100 /></div>');
 
 /* Correctly distinguish array from element test */
-$array = array("string", array('#in' => "woot"));
-$element = array('#tag' => "img");
+$array = array("string", array('>' => "woot"));
+$element = array('>tag' => "img");
 $t->test($array, 'string<div>woot</div>');
 $t->test($element, '<img />');
 
-/* #raw test */
+/* >raw test */
 $rawtest = array(
     array(
-        '#tag' => "img",
-        '#callback' => "callback_test",
-        '#weight' => 10,
-        '#raw' => "text"
+        '>tag' => "img",
+        '>cb' => "callback_test",
+        '>pos' => 10,
+        '>raw' => "text"
     ),
     "more text",
     array(
-        '#weight' => -10,
-        '#raw' => "there is ",
+        '>pos' => -10,
+        '>raw' => "there is ",
     ),
 );
 $t->test($rawtest, 'there is more text<div>Callback Test passed!text</div>');

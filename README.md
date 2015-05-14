@@ -7,22 +7,22 @@ This is a cheap an' nasty implementation of the aforementioned render
 array concept.
 
 ###Usage
-Elements of a render array where the key begins with a `#` character will be
+Elements of a render array where the key begins with a `>` character will be
 skipped on rendering. These can be used for render functions to do fancy
 stuff with.
 
-Anything that doesn't begin with a `#` character is parsed as an HTML tag
+Anything that doesn't begin with a `>` character is parsed as an HTML tag
 attribute. The default render function parses 4 special elements.
 
 These special elements are:
 
-* `#tag`: Which tag to use to render this element (Default `div`)
-* `#in`: Either a string or an array of renderable objects.  
-    When this is empty, the tag will be closed like so:
+* `>tag`: Which tag to use to render this element (Default `div`)
+* `>`: The children of this element. Either a string or an array of renderable
+    objects. When this is empty, the tag will be closed like so:
 
     ```php
-    $array['#in'] = NULL;
-    $array['#tag'] = "img";
+    $array['>'] = NULL;
+    $array['>tag'] = "img";
     ```
 
     Will become
@@ -35,26 +35,27 @@ These special elements are:
     enclose it in an array like so:
 
     ```php
-    $array['#in'] = array($subItem);
+    $array['>'] = array($subItem);
     ```
 
-* `#callback`: An optional rendering override hook. `render()` will call this
+* `>cb`: An optional rendering override hook. `render()` will call this
     function if it is found.
-* `#weight`: Elements with a heavier weight will be rendered later.
-* `#raw`: Ignore '#tag', '#in', and attributes. After ordering and callbacks,
+* `>pos`: Elements with a 'heavier' position will be rendered later.
+* `>raw`: Ignore '>tag', '>', and attributes. After ordering and callbacks,
     return this value directly.
 
 All other values are parsed as arguments like so:
 
 ```php
 $array['placeholder'] = "woot";
-$array['in'] = "hellYeah";
+$array['type'] = "text";
+$array['tag'] = "input";
 ```
 
-Forgetting the `#` in `#in` leads to this:
+Forgetting the `>` in `>tag` leads to this:
 
 ```html
-<div placeholder="woot" in="hellYeah" />
+<div placeholder="woot" type="text" tag="input" />
 ```
 
 Additionally, arguments that contain an array will have their contents split
@@ -71,9 +72,9 @@ Will become...
 ```
 
 ####Callbacks
-As mentioned before, by assigning the `#callback` value to a render array it
-will be rendered by that function instead. Additionally, extra parameters can be
-passed to `render()` which will be passed on to the callback like so:
+As mentioned before, by assigning the `>cb` value to a render array it will call
+those functions before rendering. Additionally, extra parameters can be passed
+to `render()` which will be passed on to the callback like so:
 
 ```php
 function wierdCallback($array, $opts){
@@ -84,8 +85,8 @@ function wierdCallback($array, $opts){
 }
 
 $array = array(
-    '#in' => "This text",
-    '#callback' => "wierdCallback",
+    '>' => "This text",
+    '>cb' => "wierdCallback",
 );
 
 echo render($array, array('use_default' => FALSE, 'replacement' => "That text"));
@@ -104,7 +105,7 @@ like so:
 
 ```php
 function cb($array){
-    return array('#in' => $array);
+    return array('>' => $array);
 }
 ```
 
@@ -113,12 +114,12 @@ multiple callbacks.
 
 ```php
 function cb($array){
-    return array('#tag' => "span", '#in' => $array);
+    return array('>tag' => "span", '>' => $array);
 }
 function cb2($array){
-    return array('#tag' => "code", '#in' => $array);
+    return array('>tag' => "code", '>' => $array);
 }
-render(array('#in' => "Contents", '#callback' => array("cb", "cb2")));
+render(array('>' => "Contents", '>cb' => array("cb", "cb2")));
 ```
 
 You would expect this code to wrap the `<div>` first in a `<span>`, and then in
@@ -141,12 +142,12 @@ want to override it, simply move the callback into your own callback:
 
 ```php
 function cb($array){
-    $ret = array('#tag' => "span");
-    if (isset($array['#callback'])){
-        $ret['#callback'] = $array['#callback'];
-        unset($array['#callback']);
+    $ret = array('>tag' => "span");
+    if (isset($array['>cb'])){
+        $ret['>cb'] = $array['>cb'];
+        unset($array['>cb']);
     }
-    $ret['#in'] = $array;
+    $ret['>'] = $array;
     return $ret;
 }
 ```
