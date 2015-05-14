@@ -42,6 +42,8 @@ function _process_callbacks($array, $opts){
             $callback = array_shift($array['>cb']);
             if (is_callable($callback))
                 $array = call_user_func_array($callback, array($array, $opts));
+            else
+                trigger_error("The callback type '".gettype($callback)."' is not a callable.", E_USER_WARNING);
         }
 
         if (is_array($array))
@@ -51,7 +53,7 @@ function _process_callbacks($array, $opts){
     }
     else {
         trigger_error("The callback type '".gettype($array['>cb'])."' is not a callable or an array.", E_USER_WARNING);
-        return "";
+        return $array;
     }
 }
 
@@ -87,7 +89,7 @@ function _render_value($value){
     $ret = "";
     foreach ($value as $item){
         if (is_string($item) || is_numeric($item)){
-            $ret .= $item." ";
+            $ret .= trim($item)." ";
             continue;
         }
 
@@ -100,20 +102,11 @@ function _render_value($value){
 }
 
 function _render_contents($contents, $opts){
-    if (is_string($contents)){
-        return $contents;
-    }
-    else if(is_array($contents)){
-        stable_uasort($contents, "_weight_cmp");
-        $ret = "";
-        foreach ($contents as $element)
-            $ret .= render($element, $opts);
-        return $ret;
-    }
-    else {
-        trigger_error("The child type '".gettype($contents)."' is not a string or an array.", E_USER_WARNING);
-        return "";
-    }
+    stable_uasort($contents, "_weight_cmp");
+    $ret = "";
+    foreach ($contents as $element)
+        $ret .= render($element, $opts);
+    return $ret;
 }
 
 function _weight_cmp($a, $b){

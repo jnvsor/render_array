@@ -171,6 +171,35 @@ $element = array('>tag' => "img");
 $t->test($array, 'string<div>woot</div>');
 $t->test($element, '<img />');
 
+/* Correctly distinguish contents array from element test */
+$childTypeTest = array(
+    array(
+        '>' => array(
+            array('>tag' => "li", '>' => "Yay"),
+            "It's",
+            array('>tag' => "button", '>' => "working!")
+        )
+    ),
+    array(
+        '>' => array(
+            array(
+                array('>tag' => "li", '>' => "Arrays"),
+                "Within",
+                array('>tag' => "button", '>' => "Arrays")
+            ),
+            array(
+                array('>tag' => "li", '>' => "Within"),
+                "Arrays",
+                array('>tag' => "button", '>' => "Within...")
+            )
+        )
+    ),
+    array(
+        '>' => array('>tag' => "li", '>' => "Arrays!")
+    ),
+);
+$t->test($childTypeTest, '<div><li>Yay</li>It\'s<button>working!</button></div><div><li>Arrays</li>Within<button>Arrays</button><li>Within</li>Arrays<button>Within...</button></div><div><li>Arrays!</li></div>');
+
 /* >raw test */
 $rawtest = array(
     array(
