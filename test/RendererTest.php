@@ -175,6 +175,7 @@ class RendererTest extends PHPUnit_Framework_TestCase {
                     ['>tag' => "button", '>' => "Arrays"]
                 ],
                 [
+                    '>pos' => -1,
                     ['>tag' => "li", '>' => "Within"],
                     "Arrays",
                     ['>tag' => "button", '>' => "Within..."]
@@ -184,7 +185,7 @@ class RendererTest extends PHPUnit_Framework_TestCase {
                 '>' => ['>tag' => "li", '>' => "Arrays!"]
             ],
         ];
-        $this->assertRender($array, '<div><li>Yay</li>It\'s<button>working!</button></div><li>Arrays</li>Within<button>Arrays</button><li>Within</li>Arrays<button>Within...</button><div><li>Arrays!</li></div>');
+        $this->assertRender($array, '<div><li>Yay</li>It\'s<button>working!</button></div><li>Within</li>Arrays<button>Within...</button><li>Arrays</li>Within<button>Arrays</button><div><li>Arrays!</li></div>');
     }
 
     public function testRaw(){

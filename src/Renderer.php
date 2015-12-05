@@ -82,8 +82,9 @@ class Renderer {
     protected static function render_contents($contents, $opts){
         self::stable_uasort($contents, array('\\RenderArray\\Renderer', 'weight_cmp'));
         $ret = '';
-        foreach ($contents as $element)
-            $ret .= self::render($element, $opts);
+        foreach ($contents as $key => $element)
+            if ($key !== '>pos')
+                $ret .= self::render($element, $opts);
         return $ret;
     }
 
