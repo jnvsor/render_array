@@ -80,11 +80,11 @@ class Renderer {
     }
 
     protected static function render_contents($contents, $opts){
+        unset($contents['>pos']);
         self::stable_uasort($contents, array('\\RenderArray\\Renderer', 'weight_cmp'));
         $ret = '';
-        foreach ($contents as $key => $element)
-            if ($key !== '>pos')
-                $ret .= self::render($element, $opts);
+        foreach ($contents as $element)
+            $ret .= self::render($element, $opts);
         return $ret;
     }
 
@@ -98,6 +98,7 @@ class Renderer {
         if (count($array) < 2)
             return;
 
+        $array = array_values($array);
         $halfway = count($array) / 2;
         $array1 = array_slice($array, 0, $halfway);
         $array2 = array_slice($array, $halfway);
