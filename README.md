@@ -1,139 +1,119 @@
-#The render array
-Originally a drupal idea, this is a very slimmed down version. I'm annoyed at
-not being able to alter HTML very late in the pipeline, presumeably because
-drupal has spoiled me with it's easily altered datatypes.
+# The render array
 
-This is a cheap an' nasty implementation of the aforementioned render
-array concept.
+This is a recursive descent parser that turns PHP arrays into HTML. The primary
+benefit of this is that you can create a structure and alter it's contents
+afterwards without having to pick apart HTML.
 
-###Usage
-Fields of a render array where the key begins with a `>` character will be
-skipped on rendering. These can be used for render functions to do fancy
-stuff with.
+It also makes it easy to keep frontend code DRY, as demonstrated by the
+accompanied Form class which generates form element render arrays.
 
-Anything that doesn't begin with a `>` character is parsed as an HTML tag
-attribute. The default render function parses 5 special fields.
+## Render array format
 
-These special fields are:
+### Renderable types
+*Renderables* come in 3 formats: *Strings*, *render arrays*, and *arrays of renderables*.
 
-* `>tag`: Which tag to use to render this element (Default `div`)
-* `>`: The children of this element. A renderable object (Defined as a string,
-    render array, or array of renderable objects) When this is empty, the tag
-    will be closed like so:
+*Strings* are output with `htmlspecialchars` so you can drop anything you want in
+there without worrying about some form of injection.
 
-    ```php
-    $array['>'] = NULL;
-    $array['>tag'] = "img";
-    ```
+*Render arrays* are turned into HTML by the renderer.
 
-    Will become
+### Special fields
 
-    ```html
-    <img />
-    ```
+There are 5 special fields in render arrays:
 
-    If you want a single render array as the sub item you can do that. This
-    saves typing and simplifies the array structure, but makes it difficult to
-    place more elements after it as you can no longer simply push to `>`
-    ```
+* `>tag`: The HTML tag to output. Default `'div'`
+* `>raw`: A raw string to output (For if you need to do something unexpected.
+  For example: rendering a js file inside a script tag)
+  
+  **Warning:** Text inside a `>raw` field will *not* be escaped with `htmlspecialchars`!
+* `>cb`: An array of callables to modify the array at render time
+* `>`: A renderable to be placed inside the tag. If this field is unset the tag
+  will be self-closing
 
-* `>cb`: A callable, or array of callables. `render()` will call these and
-    replace the current array with their return value.
-* `>pos`: Elements with a 'heavier' position will be rendered later.
-* `>raw`: Ignore '>tag', '>', and attributes. After ordering and callbacks,
-    return this value directly.
+The absense of these 4 fields will result in an array being treated as an *array
+of renderables*.
 
-All other values are parsed as attributes like so:
+The final special field applies to both *render arrays* and *arrays of renderables*:
 
-```php
-$array['placeholder'] = "woot";
-$array['type'] = "text";
-$array['tag'] = "input";
-```
+* `>pos`: The position of this array in it's parent container. This can be
+  imagined as "Weight" in that a larger value appears lower in final output.
+  Default `0`
 
-Forgetting the `>` in `>tag` leads to this:
+Fields of a *render array* which don't begin with a `'>'` character will be
+treated as attributes of the tag.
 
-```html
-<div placeholder="woot" type="text" tag="input" />
-```
+### Attributes
 
-Additionally, attributes that contain an array will have their contents split
-by spaces before being added to the argument like so:
+*String* and *numeric* attribute values are output with `htmlspecialchars` so you can drop
+anything you want in there without worrying about some form of injection.
 
 ```php
-$array['class'] = array("wow", "such-class", "very-array");
+$output = Renderer::render([
+    '>tag' => 'input',
+    'type' => 'text',
+    'value' => "I put \"quotes\" into your input to break your system!",
+]);
+$output === '<input type="text" value="I put &quot;quotes&quot; into your input to break your system" />';
 ```
 
-Will become...
-
-```html
-<div class="wow such-class very-array" />
-```
-
-####Callbacks
-As mentioned before, by assigning the `>cb` value to a render array it will call
-those functions before rendering. Additionally, extra parameters can be passed
-to `render()` which will be passed on to the callback like so:
+*Array* attribute values are flattened and imploded with a space.
 
 ```php
-function wierdCallback($array, $opts){
-    if (empty($opts['use_default']) || !isset($opts['replacement']))
-        return render($array);
-    else
-        return $opts['replacement'];
-}
-
-$array = array(
-    '>' => "This text",
-    '>cb' => "wierdCallback",
-);
-
-echo render($array, array('use_default' => FALSE, 'replacement' => "That text"));
-echo render($array, array('use_default' => TRUE, 'replacement' => "That text"));
+$output = Renderer::render([
+    '>tag' => 'input',
+    'type' => 'text',
+    'class' => [
+        'wow',
+        'such-class',
+        'very-array',
+    ],
+]);
+$output === '<input type="text" class="wow such-class very-array" />';
 ```
 
-Will result in:
-
-```html
-That text<div>This text</div>
-```
-
-Note that if you change the hierarchy of the array in a callback the callbacks
-for the current element will not move with it. In other words with a callback
-like so:
+*Boolean true* attribute values are output as standard HTML boolean attributes:
 
 ```php
-function cb($array){
-    return array('>' => $array);
-}
+$output = Renderer::render([
+    '>tag' => 'input',
+    'type' => 'checkbox',
+    'checked' => true,
+]);
+$output === '<input type="checkbox" checked />';
 ```
 
-The callback will have moved one layer deeper. This leads to confusion regarding
-multiple callbacks.
+*Null* and *boolean false* attribute values are ignored.
+
+## The Form class
+
+Forms are one of the places render arrays shine, due to the repetetive nature of
+form elements and the automatic escaping of strings and attribute values brought
+by the renderer.
+
+The form class optionally adds labels to form elements, and handles common
+operations such as populating selectboxes from arrays.
+
+If you suppress or ignore undefined index notices on the first page load, you
+can even pass initial form values directly from your `$_REQUEST` and they will
+be handled correctly after submit:
 
 ```php
-function cb($array){
-    return array('>tag' => "span", '>' => $array);
-}
-function cb2($array){
-    return array('>tag' => "code", '>' => $array);
-}
-render(array('>' => "Contents", '>cb' => array("cb", "cb2")));
+<form method="post">
+<?php
+
+include 'vendor/autoload.php';
+
+use \RenderArray\Renderer;
+use \RenderArray\Form;
+
+echo Renderer::render([
+    @Form::text('test', $_POST['test'], "Fill me in"),
+    Form::submit()
+]);
+?>
+</form>
 ```
 
-You would expect this code to wrap the `<div>` first in a `<span>`, and then in
-a `<code>`:
+## More info
 
-```html
-<code><span><div>Contents</div></span></code>
-```
-
-The callbacks remain on the element that has been wrapped, meaning that first
-the div is wrapped in a span, and then the div is wrapped in a code. This
-results in this output:
-
-```html
-<span><code><div>Contents</div></code></span>
-```
-
-This behaviour stops things breaking when you alter the hierarchy.
+For more examples, see the Form class and the tests.

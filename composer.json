@@ -15,6 +15,7 @@
         }
     ],
     "require-dev": {
-        "phpunit/phpunit": "*"
+        "phpunit/phpunit": "*",
+        "phpdocumentor/phpdocumentor": "*"
     }
 }

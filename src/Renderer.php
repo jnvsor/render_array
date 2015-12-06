@@ -127,10 +127,18 @@ class Renderer {
         return;
     }
 
+    /**
+     * Determines whether an array is a render array
+     * 
+     * If neither `>tag` nor `>` nor `>cb` nor `>raw` are set this would render
+     * to '<div />' which is invalid HTML - thus we can infer that this is not a
+     * render array.
+     * 
+     * @param mixed $array The value to check
+     * 
+     * @return bool
+     */
     public static function is_render_array($array){
-        /* If neither >tag nor > nor >cb nor >raw are set this would render
-         * to '<div />' which is invalid HTML - thus we can infer that this is not a
-         * render array. */
         return (
             is_array($array) &&
             (
@@ -142,6 +150,14 @@ class Renderer {
         );
     }
 
+    /**
+     * Renders a render array and returns a string of HTML.
+     * 
+     * @param mixed $array The renderable to render
+     * @param mixed $opts Options to pass to callbacks
+     * 
+     * @return string
+     */
     public static function render($array, $opts = NULL){
         if ($array === null)
             return '';
