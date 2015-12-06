@@ -47,7 +47,7 @@ class Renderer {
         $ret = '';
 
         foreach ($array as $attr => $val){
-            if (substr($attr, 0, 1) == '>')
+            if (substr($attr, 0, 1) === '>')
                 continue;
             else if ($val === TRUE)
                 $ret .= ' '.$attr;
