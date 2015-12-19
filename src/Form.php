@@ -145,6 +145,7 @@ class Form {
             'type' => 'password',
             'id' => $id,
             'name' => $name,
+            'autocomplete' => 'off',
         ];
 
         $output = self::wrap($input, $labelText, $id);

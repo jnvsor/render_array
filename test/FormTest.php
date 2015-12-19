@@ -209,9 +209,10 @@ class FormTest extends PHPUnit_Framework_TestCase {
             'type' => 'password',
             'id' => null,
             'name' => 'testname',
+            'autocomplete' => 'off',
             '>pos' => 10,
         ], $array);
-        $this->assertRender($array, '<input type="password" name="testname" />');
+        $this->assertRender($array, '<input type="password" name="testname" autocomplete="off" />');
 
         $array = Form::unwrap(Form::password('testname', null, true));
         $this->assertSame([
@@ -219,9 +220,10 @@ class FormTest extends PHPUnit_Framework_TestCase {
             'type' => 'password',
             'id' => 'testname',
             'name' => 'testname',
+            'autocomplete' => 'off',
             '>pos' => 10,
         ], $array);
-        $this->assertRender($array, '<input type="password" id="testname" name="testname" />');
+        $this->assertRender($array, '<input type="password" id="testname" name="testname" autocomplete="off" />');
 
         $array = Form::unwrap(Form::password('testname', null, 'testid'));
         $this->assertSame([
@@ -229,9 +231,10 @@ class FormTest extends PHPUnit_Framework_TestCase {
             'type' => 'password',
             'id' => 'testid',
             'name' => 'testname',
+            'autocomplete' => 'off',
             '>pos' => 10,
         ], $array);
-        $this->assertRender($array, '<input type="password" id="testid" name="testname" />');
+        $this->assertRender($array, '<input type="password" id="testid" name="testname" autocomplete="off" />');
     }
 
     /**
