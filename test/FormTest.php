@@ -366,13 +366,14 @@ class FormTest extends PHPUnit_Framework_TestCase {
                     ],
                 ],
             ],
+            'autocomplete' => 'off',
             '>pos' => 10,
             'multiple' => true,
         ]
         , $array);
         $this->assertRender(
             $array,
-            '<select id="testid" name="testname[]" multiple>'
+            '<select id="testid" name="testname[]" autocomplete="off" multiple>'
             .'<option value="a">Option A</option>'
             .'<option value="b" selected>Option B</option>'
             .'<optgroup label="Group!">'

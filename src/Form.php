@@ -241,6 +241,9 @@ class Form {
             '>' => self::options($options, $selected),
         ];
 
+        if (!empty($selected))
+            $input['autocomplete'] = 'off';
+
         $output = self::wrap($input, $labelText, $id);
         $output['class'][] = 'input-type-select';
 
