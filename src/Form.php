@@ -428,4 +428,35 @@ class Form {
 
         return $output;
     }
+
+    /**
+     * Generates a fieldset
+     * 
+     * @param array|string $contents The contents of the fieldset as a renderable
+     * @param string $labelText The text for the legend
+     * @param string $id The fieldest ID
+     * @param array $config Extra options for the fieldset
+     * 
+     * @return array The fieldset
+     */
+    public static function fieldset($contents = null, $labelText = null, $id = null, $config = []){
+        $contents = [$contents];
+
+        if ($labelText)
+            $contents = [
+                [
+                    '>tag' => 'legend',
+                    '>' => $labelText,
+                ],
+                $contents,
+            ];
+
+        $fieldset = [
+            '>tag' => 'fieldset',
+            '>' => $contents,
+            'id' => $id,
+        ];
+
+        return array_replace($fieldset, $config);
+    }
 }

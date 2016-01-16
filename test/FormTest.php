@@ -606,4 +606,38 @@ class FormTest extends PHPUnit_Framework_TestCase {
             .'</div>'
         );
     }
+
+    /**
+     * @depends testText
+     */
+    public function testFieldset(){
+        $array = Form::fieldset();
+        $this->assertSame([
+            '>tag' => 'fieldset',
+            '>' => [null],
+            'id' => null,
+        ], $array);
+        $this->assertRender($array, '<fieldset></fieldset>');
+
+        $contents = Form::text('t', 'v', "L");
+        $array = Form::fieldset($contents, "Label", 'fancy-fieldset');
+        $this->assertSame([
+            '>tag' => 'fieldset',
+            '>' => [
+                [
+                    '>tag' => 'legend',
+                    '>' => "Label",
+                ],
+                [$contents],
+            ],
+            'id' => 'fancy-fieldset',
+        ], $array);
+
+        $this->assertRender(
+            $array,
+            '<fieldset id="fancy-fieldset"><legend>Label</legend>'
+            .Renderer::render($contents)
+            .'</fieldset>'
+        );
+    }
 }
