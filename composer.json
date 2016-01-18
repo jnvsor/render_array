@@ -3,7 +3,7 @@
     "description": "A recursive descent parser to turn PHP arrays into HTML",
     "type": "library",
     "license": "GPL-2.0",
-    "version": "0.1",
+    "version": "0.2",
     "autoload": {
         "psr-4": {
             "RenderArray\\": "src/"
